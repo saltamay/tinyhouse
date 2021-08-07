@@ -1,18 +1,12 @@
 import express from 'express';
-import { listings } from './listings';
+import { ApolloServer } from 'apollo-server-express';
+import { resolvers, typeDefs } from './graphql';
 
 export const app = express();
 const port = 3000;
 
-app.use(express.json());
-
-app.get('/', (_req, res) => {
-	res.send('Hello World!');
-});
-
-app.get('/listings', (_req, res) => {
-	res.send(listings);
-});
+const server = new ApolloServer({ typeDefs, resolvers });
+server.applyMiddleware({ app, path: '/api' });
 
 if (process.env.NODE_ENV !== 'test') {
 	app.listen(port, () => {
