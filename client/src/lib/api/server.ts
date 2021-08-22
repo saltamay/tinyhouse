@@ -3,6 +3,10 @@ interface Body<TypeVariables> {
 	variables?: TypeVariables;
 }
 
+interface Error {
+	message: string;
+}
+
 export const server = {
 	fetch: async <TData = any, TypeVariables = any>(
 		body: Body<TypeVariables>
@@ -15,6 +19,10 @@ export const server = {
 			body: JSON.stringify(body),
 		});
 
-		return res.json() as Promise<{ data: TData }>;
+		if (!res.ok) {
+			throw new Error('Failed to fetch from server.');
+		}
+
+		return res.json() as Promise<{ data: TData; errors: Error[] }>;
 	},
 };
