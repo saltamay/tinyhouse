@@ -1,6 +1,6 @@
-interface Body<TypeVariables> {
+interface Body<TVariables> {
 	query: string;
-	variables?: TypeVariables;
+	variables?: TVariables;
 }
 
 interface Error {
@@ -8,9 +8,7 @@ interface Error {
 }
 
 export const server = {
-	fetch: async <TData = any, TypeVariables = any>(
-		body: Body<TypeVariables>
-	) => {
+	fetch: async <TData = any, TVariables = any>(body: Body<TVariables>) => {
 		const res = await fetch('/api', {
 			method: 'POST',
 			headers: {
