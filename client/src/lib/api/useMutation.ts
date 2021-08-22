@@ -1,11 +1,5 @@
-import { useState } from 'react';
-import { server } from './server';
-
-interface State<TData> {
-	data: TData | null;
-	error: Boolean;
-	loading: Boolean;
-}
+import { useReducer } from 'react';
+import { reducer, State, fetchApi } from './utils';
 
 type MutationTuple<TData, TVariables> = [
 	(variables?: TVariables | undefined) => Promise<void>,
@@ -15,31 +9,15 @@ type MutationTuple<TData, TVariables> = [
 export const useMutation = <TData = any, TVariables = any>(
 	query: string
 ): MutationTuple<TData, TVariables> => {
-	const [state, setState] = useState<State<TData>>({
+	const fetchReducer = reducer<TData>();
+	const [state, dispatch] = useReducer(fetchReducer, {
 		data: null,
 		error: false,
 		loading: false,
 	});
 
-	const fetch = async (variables?: TVariables) => {
-		try {
-			setState({ data: null, error: false, loading: true });
-
-			const { data, errors } = await server.fetch<TData, TVariables>({
-				query,
-				variables,
-			});
-
-			if (errors && errors.length) {
-				throw new Error(errors[0].message);
-			}
-
-			setState({ data, error: false, loading: false });
-		} catch (err) {
-			setState({ data: null, error: true, loading: false });
-			throw console.error(err);
-		}
-	};
+	const fetch = (variables?: TVariables) =>
+		fetchApi(dispatch, query, variables);
 
 	return [fetch, state];
 };
