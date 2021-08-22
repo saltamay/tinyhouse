@@ -1,9 +1,12 @@
 import { gql, useMutation, useQuery } from '@apollo/client';
+import { Alert, Avatar, Button, List, Spin } from 'antd';
 import {
 	DeleteListingData,
 	DeleteListingVariables,
 	ListingsData,
 } from './types';
+import { ListingsSkeleton } from './components';
+import './styles/Listings.css';
 
 const LISTINGS = gql`
 	query Listings {
@@ -46,38 +49,66 @@ export const Listings = ({ title }: Props) => {
 
 	const listings = data ? data.listings : null;
 
-	const listingList = (
-		<ul>
-			{listings &&
-				listings.map((listing) => (
-					<li key={listing.id}>
-						{listing.title}
-						<button onClick={() => handleDeleteListing(listing.id)}>
+	const listingList = listings ? (
+		<List
+			itemLayout='horizontal'
+			loading={loading}
+			dataSource={listings}
+			renderItem={(item) => (
+				<List.Item
+					key={item.id}
+					actions={[
+						<Button type='primary' onClick={() => handleDeleteListing(item.id)}>
 							Delete
-						</button>
-					</li>
-				))}
-		</ul>
-	);
-
-	const deleteListingLoadingMessage = deleteListingLoading ? (
-		<h4>Deletion in progress...</h4>
+						</Button>,
+					]}
+				>
+					<List.Item.Meta
+						avatar={<Avatar src={item.image} shape='square' size={48} />}
+						title={item.title}
+						description={item.address}
+					/>
+				</List.Item>
+			)}
+		/>
 	) : null;
 
-	const deleteListingErrorMessage = deleteListingError ? (
-		<h4>Uh oh! Something went wrong with deletion :(</h4>
-	) : null;
+	if (loading) {
+		return (
+			<div className='listings'>
+				<ListingsSkeleton title={title} />
+			</div>
+		);
+	}
 
-	if (loading) return <h2>Loading...</h2>;
-
-	if (error) return <h2>Uh oh! Something went wrong :(</h2>;
+	if (error) {
+		return (
+			<div className='listings'>
+				{error && (
+					<Alert
+						className='listings__alert'
+						type='error'
+						message='Uh oh! Something went wrong :('
+					/>
+				)}
+				<ListingsSkeleton title={title} />
+			</div>
+		);
+	}
 
 	return (
-		<>
-			<h2>{title}</h2>
-			{listingList}
-			{deleteListingLoadingMessage}
-			{deleteListingErrorMessage}
-		</>
+		<div className='listings'>
+			<Spin spinning={deleteListingLoading} size='large'>
+				{deleteListingError && (
+					<Alert
+						className='listings__alert'
+						type='error'
+						message='Uh oh! Something went wrong :('
+					/>
+				)}
+				<h2>{title}</h2>
+				{listingList}
+			</Spin>
+		</div>
 	);
 };
