@@ -1,5 +1,5 @@
 {
-	"name": "tinyhouse",
+	"name": "tinyhouse-server",
 	"version": "1.0",
 	"scripts": {
 		"start": "nodemon --exec ./node_modules/.bin/ts-node src/index.ts",
