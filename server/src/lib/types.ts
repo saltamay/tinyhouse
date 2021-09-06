@@ -69,7 +69,7 @@ export interface Listing {
   lastReview?: Date;
   accommodates?: number; // numOfGuests
   bedrooms: number;
-  beds: number;
+  beds: number; // numOfBeds
   bathrooms: number;
   numberOfReviews?: number;
 	images: Image;
@@ -97,4 +97,12 @@ export interface Database {
   bookings: Collection<Booking>;
 	listings: Collection<Listing>;
   users: Collection<User>;
+}
+
+export interface Viewer {
+  _id?: string;
+  token?: string;
+  avatar?: string;
+  walletId?: string;
+  didRequest: boolean;
 }
